@@ -1,6 +1,7 @@
 package com.github.mushroommif.aoh3loader.impl
 
 import com.github.mushroommif.aoh3loader.impl.patch.EntrypointPatch
+import com.google.gson.GsonBuilder
 import net.fabricmc.loader.api.metadata.ModDependency
 import net.fabricmc.loader.impl.game.GameProvider
 import net.fabricmc.loader.impl.game.GameProvider.BuiltinMod
@@ -9,8 +10,6 @@ import net.fabricmc.loader.impl.launch.FabricLauncher
 import net.fabricmc.loader.impl.metadata.BuiltinModMetadata
 import net.fabricmc.loader.impl.metadata.ModDependencyImpl
 import net.fabricmc.loader.impl.util.Arguments
-import net.fabricmc.loader.impl.util.SystemProperties
-import java.io.File
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.nio.file.Files
@@ -49,7 +48,7 @@ class AOH3GameProvider: GameProvider {
     }
 
     override fun getEntrypoint(): String {
-        return GAME_ENTRYPOINT
+        return gameEntrypoint
     }
 
     override fun getLaunchDirectory(): Path = Paths.get(".")
@@ -81,12 +80,23 @@ class AOH3GameProvider: GameProvider {
     }
 
     override fun launch(loader: ClassLoader) {
-        val mainClass = loader.loadClass(GAME_ENTRYPOINT)
-        val invoker = MethodHandles.lookup().findStatic(
-            mainClass, "main", MethodType.methodType(
-                Void.TYPE, Array<String>::class.java
+        val mainClass = try {
+            loader.loadClass(gameEntrypoint)
+        } catch (_: ClassNotFoundException) {
+            error("Specified in $launchSettingsPath gameEntrypoint class does not exist")
+        }
+
+        val invoker = try {
+            MethodHandles.lookup().findStatic(
+                mainClass, "main", MethodType.methodType(
+                    Void.TYPE, Array<String>::class.java
+                )
             )
-        )
+        } catch (_: NoSuchMethodException) {
+            error("Specified in $launchSettingsPath gameEntrypoint class does not have a \"main\" method")
+        } catch (_: IllegalAccessException) {
+            error("Specified in $launchSettingsPath gameEntrypoint class does not have a static \"main\" method")
+        }
 
         invoker.invokeExact(arrayOf<String>())
     }
@@ -98,22 +108,62 @@ class AOH3GameProvider: GameProvider {
     override fun getLaunchArguments(sanitize: Boolean): Array<String> = emptyArray()
 
     companion object {
-        private const val GAME_ENTRYPOINT = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher"
-        private val gameValuesPath = Paths.get("game/gameValues/GameValues_Text.json").toAbsolutePath()
-        private val gameJarPath = Paths.get(
-            System.getProperty(SystemProperties.GAME_JAR_PATH) ?: "aoh3.exe"
-        )
+        private val launchSettingsPath = Paths.get("fabric_launch_settings.json")
+
+        private fun loadLaunchSettings(): AOH3LaunchSettings {
+            val launchSettingsFile = launchSettingsPath.toFile()
+            val gson = GsonBuilder()
+                .setPrettyPrinting()
+                .create()
+
+            if (!launchSettingsFile.exists()) {
+                val defaultSettings = AOH3LaunchSettings()
+                launchSettingsFile.createNewFile()
+                launchSettingsFile.writeText(
+                    gson.toJson(defaultSettings)
+                )
+                return defaultSettings
+            }
+
+            return gson.fromJson(
+                launchSettingsFile.readText(), AOH3LaunchSettings::class.java
+            )
+        }
+
+        val launchSettings = loadLaunchSettings()
+        private val gameJarPath = Paths.get(launchSettings.jarPath)
+        private val gameEntrypoint = launchSettings.gameEntrypoint
 
         private fun loadGameVersion(): String {
-            val predefinedVersion = System.getProperty(SystemProperties.GAME_VERSION)
-            if (predefinedVersion != null) return predefinedVersion
+            val versionOverride = launchSettings.versionOverride
+            if (versionOverride.isNotBlank()) {
+                return versionOverride
+            }
 
-            val gameValuesFile = File(gameValuesPath.toUri())
+            val gameValuesPath = launchSettings.gameValuesPath
+            if (gameValuesPath.isBlank()) {
+                if (versionOverride.isNotBlank()) {
+                    return versionOverride
+                } else {
+                    error("gameValuesPath and versionOverride are both empty in $launchSettingsPath. " +
+                            "At least one of them should be specified")
+                }
+            }
+
+            val gameValuesFile = Paths.get(gameValuesPath).toFile()
+            if (!gameValuesFile.exists()) {
+                error("Specified in $launchSettingsPath gameValues file does not exist")
+            }
+
             val gameValuesJson = gameValuesFile.readText()
-
-            return gameValuesJson
-                .split("VERSION: \"")[1]
-                .split("\"")[0]
+            return try {
+                gameValuesJson
+                    .split("VERSION: \"")[1]
+                    .split("\"")[0]
+            } catch (e: Exception) {
+                throw Exception("Failed to read gameValues file, is it corrupted or is the format changed? " +
+                        "If it is the second, you can use \"versionOverride\" in $launchSettingsPath for now", e)
+            }
         }
     }
 }
