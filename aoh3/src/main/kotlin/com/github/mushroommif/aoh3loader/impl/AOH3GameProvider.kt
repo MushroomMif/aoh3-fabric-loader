@@ -83,7 +83,7 @@ class AOH3GameProvider: GameProvider {
         val mainClass = try {
             loader.loadClass(gameEntrypoint)
         } catch (_: ClassNotFoundException) {
-            error("Specified in $launchSettingsPath gameEntrypoint class does not exist")
+            error("Specified in $launchSettingsPath game_entrypoint class does not exist")
         }
 
         val invoker = try {
@@ -93,9 +93,9 @@ class AOH3GameProvider: GameProvider {
                 )
             )
         } catch (_: NoSuchMethodException) {
-            error("Specified in $launchSettingsPath gameEntrypoint class does not have a \"main\" method")
+            error("Specified in $launchSettingsPath game_entrypoint class does not have a \"main\" method")
         } catch (_: IllegalAccessException) {
-            error("Specified in $launchSettingsPath gameEntrypoint class does not have a static \"main\" method")
+            error("Specified in $launchSettingsPath game_entrypoint class does not have a static \"main\" method")
         }
 
         invoker.invokeExact(arrayOf<String>())
@@ -114,6 +114,7 @@ class AOH3GameProvider: GameProvider {
             val launchSettingsFile = launchSettingsPath.toFile()
             val gson = GsonBuilder()
                 .setPrettyPrinting()
+                .registerTypeHierarchyAdapter(AOH3LaunchSettings::class.java, AOH3LaunchSettings.Serializer)
                 .create()
 
             if (!launchSettingsFile.exists()) {
@@ -125,9 +126,14 @@ class AOH3GameProvider: GameProvider {
                 return defaultSettings
             }
 
-            return gson.fromJson(
-                launchSettingsFile.readText(), AOH3LaunchSettings::class.java
-            )
+            return try {
+                gson.fromJson(
+                    launchSettingsFile.readText(), AOH3LaunchSettings::class.java
+                )
+            } catch (e: Exception) {
+                throw Exception("Failed to read $launchSettingsPath. " +
+                        "You can delete it and run the loader again, it will reset the file", e)
+            }
         }
 
         val launchSettings = loadLaunchSettings()
@@ -145,14 +151,14 @@ class AOH3GameProvider: GameProvider {
                 if (versionOverride.isNotBlank()) {
                     return versionOverride
                 } else {
-                    error("gameValuesPath and versionOverride are both empty in $launchSettingsPath. " +
+                    error("game_values_path and version_override are both empty in $launchSettingsPath. " +
                             "At least one of them should be specified")
                 }
             }
 
             val gameValuesFile = Paths.get(gameValuesPath).toFile()
             if (!gameValuesFile.exists()) {
-                error("Specified in $launchSettingsPath gameValues file does not exist")
+                error("Specified in $launchSettingsPath game_values file does not exist")
             }
 
             val gameValuesJson = gameValuesFile.readText()
@@ -161,8 +167,8 @@ class AOH3GameProvider: GameProvider {
                     .split("VERSION: \"")[1]
                     .split("\"")[0]
             } catch (e: Exception) {
-                throw Exception("Failed to read gameValues file, is it corrupted or is the format changed? " +
-                        "If it is the second, you can use \"versionOverride\" in $launchSettingsPath for now", e)
+                throw Exception("Failed to read game_values file, is it corrupted or is the format changed? " +
+                        "If it is the second, you can use \"version_override\" in $launchSettingsPath for now", e)
             }
         }
     }
