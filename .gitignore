@@ -22,6 +22,7 @@
 !/proguard.conf
 
 !/minecraft
+!/aoh3
 !/junit
 
 # MacOS junk files

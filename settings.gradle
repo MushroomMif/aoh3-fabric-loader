@@ -18,6 +18,5 @@ if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
 	throw new UnsupportedOperationException("Fabric Loader requires Java 17+ to build.")
 }
 
-include "minecraft"
+include "aoh3"
 include "junit"
-include "minecraft:minecraft-test"
