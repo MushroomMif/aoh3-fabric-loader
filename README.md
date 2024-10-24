@@ -1,10 +1,9 @@
 AOH3 Fabric Loader
 ===========
-This is a modified for working with Age of History 3 game, version of 
-Fabric Loader originally created for Minecraft modding.
+This is a version of Fabric Loader, originally created for Minecraft modding,
+modified for working with Age of History 3 game.
 For now, it is very experimental and can be unstable, but you can
-already try it. Known issues:
-- Logging system of the game is not working properly
+already try it.
 
 # How to use it:
 > [!WARNING]  
