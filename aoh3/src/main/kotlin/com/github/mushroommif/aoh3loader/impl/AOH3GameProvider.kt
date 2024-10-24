@@ -148,12 +148,8 @@ class AOH3GameProvider: GameProvider {
 
             val gameValuesPath = launchSettings.gameValuesPath
             if (gameValuesPath.isBlank()) {
-                if (versionOverride.isNotBlank()) {
-                    return versionOverride
-                } else {
-                    error("game_values_path and version_override are both empty in $launchSettingsPath. " +
-                            "At least one of them should be specified")
-                }
+                error("game_values_path and version_override are both empty in $launchSettingsPath. " +
+                        "At least one of them should be specified")
             }
 
             val gameValuesFile = Paths.get(gameValuesPath).toFile()
