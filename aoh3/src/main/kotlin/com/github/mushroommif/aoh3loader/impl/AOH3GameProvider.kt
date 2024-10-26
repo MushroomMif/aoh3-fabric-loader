@@ -137,6 +137,12 @@ class AOH3GameProvider: GameProvider {
         }
 
         val launchSettings = loadLaunchSettings()
+        init {
+            if (launchSettings.jarPath == "error") {
+                error("The launcher failed to locate jar file of the game, so you need to specify it in $launchSettingsPath by yourself")
+            }
+        }
+
         private val gameJarPath = Paths.get(launchSettings.jarPath)
         private val gameEntrypoint = launchSettings.gameEntrypoint
 

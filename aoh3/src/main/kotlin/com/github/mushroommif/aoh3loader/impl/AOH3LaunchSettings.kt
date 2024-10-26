@@ -7,16 +7,29 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import java.lang.reflect.Type
+import java.nio.file.Paths
 
 data class AOH3LaunchSettings(
-    val jarPath: String = defaultJarPath,
+    val jarPath: String = if (isOnMac()) locateMacJar() else "aoh3.exe",
     val gameValuesPath: String = "game/gameValues/GameValues_Text.json",
     val gameEntrypoint: String = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher",
     val versionOverride: String = ""
 ) {
     companion object Serializer: JsonSerializer<AOH3LaunchSettings>, JsonDeserializer<AOH3LaunchSettings> {
-        private val defaultJarPath = if (isOnMac()) "Age of History 3.app" else "aoh3.exe"
-        private fun isOnMac(): Boolean = System.getProperty("os.name").lowercase().startsWith("mac")
+        private fun isOnMac(): Boolean {
+            return System.getProperty("os.name").lowercase().startsWith("mac")
+        }
+
+        private fun locateMacJar(): String {
+            return try {
+                val contentDir = Paths.get("Age of History 3.app/Contents/MacOS").toFile()
+                contentDir.list().first {
+                    it.startsWith("Age of History 3") && it.endsWith(".jar")
+                }
+            } catch (_: Exception) {
+                "error"
+            }
+        }
 
         override fun serialize(
             src: AOH3LaunchSettings,
