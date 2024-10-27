@@ -1,6 +1,6 @@
 package com.github.mushroommif.aoh3loader.impl
 
-import com.github.mushroommif.aoh3loader.impl.patch.EntrypointPatch
+import com.github.mushroommif.aoh3loader.impl.patch.*
 import com.google.gson.GsonBuilder
 import net.fabricmc.loader.api.metadata.ModDependency
 import net.fabricmc.loader.impl.game.GameProvider
@@ -19,7 +19,7 @@ import java.nio.file.Paths
 class AOH3GameProvider: GameProvider {
     private val arguments = Arguments() // there is no arguments passed to the game on launch
     private val gameVersion: String = loadGameVersion()
-    private val transformer = GameTransformer(EntrypointPatch)
+    private val transformer = GameTransformer(EntrypointPatch, BrandingPatch)
 
     override fun getGameId(): String = "aoh3"
 
