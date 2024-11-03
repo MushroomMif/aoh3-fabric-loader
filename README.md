@@ -1,8 +1,11 @@
+[🇷🇺 Русский](https://github.com/MushroomMif/aoh3-fabric-loader/blob/master/README_RU.md)
+-----
 AOH3 Fabric Loader
 ===========
 This is a version of Fabric Loader, originally created for Minecraft modding,
 modified for working with Age of History 3 game.
-It is in early beta stage right now and can contain bugs, but you can already use it.
+The loader is fully working now and looks stable, but the whole ecosystem around
+it is still in beta so expect some bugs and flaws while using it.
 
 # How to use it:
 1. Go to "Actions" page of this repository, open a last action and
@@ -23,8 +26,10 @@ If you are using Mac:<br/>
    java -cp "./*" net.fabricmc.loader.impl.launch.knot.KnotClient
    ```
 5. Open the created file, it will launch the game with the loader
-6. Now you can put mods into `mods` directory and configure
-`fabric_launch_settings.json` if needed. Enjoy!
+6. Now you can put mods into `mods` directory (we recommend you to install
+   [AOH3 Fabric Api](https://github.com/MushroomMif/aoh3-fabric-loader) right away 
+   as almost all mods need this for working properly) and configure
+   `fabric_launch_settings.json` if needed. Enjoy!
 
 # How to develop a mod for it:
 Have a look at [Example AOH3 Fabric mod repository](https://github.com/MushroomMif/example-aoh3-fabric-mod).
