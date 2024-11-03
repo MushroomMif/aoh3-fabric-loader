@@ -32,7 +32,7 @@ object BrandingPatch: GamePatch() {
         classSource: Function<String, ClassNode?>,
         classEmitter: Consumer<ClassNode>
     ) {
-        // Adding " Fabric" to game version
+        // Adding " Fabric" to game version and calculating new x position for it in menu
         val gameValuesClass = classSource.apply(GV_INJECTED_CLASS)
             ?: return logFailure("Could not load class $GV_INJECTED_CLASS")
         val initMethod = findMethod(gameValuesClass) { method ->
@@ -67,8 +67,8 @@ object BrandingPatch: GamePatch() {
         }
     }
 
-    @Suppress("UNUSED")
-    const val VERSION_TEXT_POS_X = 105
+    @JvmField
+    var VERSION_TEXT_POS_X = 0
 
     @JvmStatic @Suppress("UNUSED")
     fun setCustomBranding() {
@@ -81,6 +81,11 @@ object BrandingPatch: GamePatch() {
             val versionField = gameTextClass.getField("VERSION")
             val currentVersion = versionField.get(gameText) as String
             versionField.set(gameText, "$currentVersion Fabric")
+
+            val cfgClass = FabricLauncherBase.getClass("aoc.kingdoms.lukasz.jakowski.CFG")
+            val buttonHeight3Field = cfgClass.getField("BUTTON_HEIGHT3")
+            val buttonHeight3 = buttonHeight3Field.get(null) as Int
+            VERSION_TEXT_POS_X = (buttonHeight3 * 2.3).toInt()
         } catch (e: Exception) {
             Log.warn(LogCategory.GAME_PATCH, "Failed to set custom branding", e)
         }
