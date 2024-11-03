@@ -27,7 +27,7 @@ If you are using Mac:<br/>
    ```
 5. Open the created file, it will launch the game with the loader
 6. Now you can put mods into `mods` directory (we recommend you to install
-   [AOH3 Fabric Api](https://github.com/MushroomMif/aoh3-fabric-loader) right away 
+   [AOH3 Fabric Api](https://github.com/MushroomMif/aoh3-fabric-api) right away 
    as almost all mods need this for working properly) and configure
    `fabric_launch_settings.json` if needed. Enjoy!
 
