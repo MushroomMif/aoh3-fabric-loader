@@ -10,6 +10,7 @@ import net.fabricmc.loader.impl.launch.FabricLauncher
 import net.fabricmc.loader.impl.metadata.BuiltinModMetadata
 import net.fabricmc.loader.impl.metadata.ModDependencyImpl
 import net.fabricmc.loader.impl.util.Arguments
+import java.io.File
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.nio.file.Files
@@ -109,31 +110,51 @@ class AOH3GameProvider: GameProvider {
 
     companion object {
         private val launchSettingsPath = Paths.get("fabric_launch_settings.json")
+        private val gson = GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeHierarchyAdapter(AOH3LaunchSettings::class.java, AOH3LaunchSettings.Serializer)
+            .create()
 
         private fun loadLaunchSettings(): AOH3LaunchSettings {
             val launchSettingsFile = launchSettingsPath.toFile()
-            val gson = GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeHierarchyAdapter(AOH3LaunchSettings::class.java, AOH3LaunchSettings.Serializer)
-                .create()
-
             if (!launchSettingsFile.exists()) {
-                val defaultSettings = AOH3LaunchSettings()
-                launchSettingsFile.createNewFile()
-                launchSettingsFile.writeText(
-                    gson.toJson(defaultSettings)
-                )
-                return defaultSettings
+                return AOH3LaunchSettings().also {
+                    saveLaunchSettings(it, launchSettingsFile)
+                }
             }
 
             return try {
-                gson.fromJson(
-                    launchSettingsFile.readText(), AOH3LaunchSettings::class.java
+                updateLaunchSettings(
+                    gson.fromJson(
+                        launchSettingsFile.readText(), AOH3LaunchSettings::class.java
+                    ), launchSettingsFile
                 )
             } catch (e: Exception) {
                 throw Exception("Failed to read $launchSettingsPath. " +
                         "You can delete it and run the loader again, it will reset the file", e)
             }
+        }
+
+        private fun updateLaunchSettings(settings: AOH3LaunchSettings, saveFile: File): AOH3LaunchSettings {
+            val version = settings.schemaVersion
+            if (settings.schemaVersion == AOH3LaunchSettings.SCHEMA_VERSION) {
+                return settings
+            }
+
+            if (version < 1 && settings.jarPath == "aoh3.exe") {
+                settings.jarPath = "aoh3.jar"
+            }
+
+            settings.schemaVersion = AOH3LaunchSettings.SCHEMA_VERSION
+            saveLaunchSettings(settings, saveFile)
+            return settings
+        }
+
+        private fun saveLaunchSettings(settings: AOH3LaunchSettings, file: File) {
+            file.createNewFile()
+            file.writeText(
+                gson.toJson(settings)
+            )
         }
 
         val launchSettings = loadLaunchSettings()
