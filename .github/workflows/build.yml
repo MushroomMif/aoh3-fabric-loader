@@ -22,4 +22,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: build/libs/fabric-loader-0.16.7-fat.jar
+          path: build/libs/fabric-loader-0.16.8-fat.jar
