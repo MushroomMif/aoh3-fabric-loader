@@ -2,6 +2,9 @@ package com.github.mushroommif.aoh3loader.impl
 
 import com.github.mushroommif.aoh3loader.impl.patch.*
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import net.fabricmc.loader.api.metadata.ModDependency
 import net.fabricmc.loader.impl.game.GameProvider
 import net.fabricmc.loader.impl.game.GameProvider.BuiltinMod
@@ -61,11 +64,7 @@ class AOH3GameProvider: GameProvider {
     override fun isEnabled(): Boolean = true
 
     override fun locateGame(launcher: FabricLauncher, args: Array<out String>): Boolean {
-        if (!Files.exists(gameJarPath)) {
-            return false
-        }
-
-        return true
+        return Files.exists(gameJarPath)
     }
 
     override fun initialize(launcher: FabricLauncher) {
@@ -119,41 +118,65 @@ class AOH3GameProvider: GameProvider {
             val launchSettingsFile = launchSettingsPath.toFile()
             if (!launchSettingsFile.exists()) {
                 return AOH3LaunchSettings().also {
-                    saveLaunchSettings(it, launchSettingsFile)
+                    saveLaunchSettings(gson.toJsonTree(it), launchSettingsFile)
                 }
             }
 
             return try {
-                updateLaunchSettings(
-                    gson.fromJson(
-                        launchSettingsFile.readText(), AOH3LaunchSettings::class.java
-                    ), launchSettingsFile
-                )
+                val settingsJson = JsonParser()
+                    .parse(launchSettingsFile.readText())
+                    .asJsonObject
+
+                if (updateLaunchSettingsJson(settingsJson)) {
+                    saveLaunchSettings(settingsJson, launchSettingsFile)
+                }
+
+                gson.fromJson(settingsJson, AOH3LaunchSettings::class.java)
             } catch (e: Exception) {
                 throw Exception("Failed to read $launchSettingsPath. " +
                         "You can delete it and run the loader again, it will reset the file", e)
             }
         }
 
-        private fun updateLaunchSettings(settings: AOH3LaunchSettings, saveFile: File): AOH3LaunchSettings {
-            val version = settings.schemaVersion
-            if (settings.schemaVersion == AOH3LaunchSettings.SCHEMA_VERSION) {
-                return settings
+        /**
+         * @return Was json object modified
+         */
+        private fun updateLaunchSettingsJson(json: JsonObject): Boolean {
+            val schemaVersion = json.get("__schema_version")?.asInt ?: 0
+            if (schemaVersion >= AOH3LaunchSettings.SCHEMA_VERSION) {
+                return false
             }
 
-            if (version < 1 && settings.jarPath == "game.exe") {
-                settings.jarPath = "game.jar"
+            var wasModified = false
+            fun onModify() {
+                wasModified = true
+                json.addProperty("__schema_version", AOH3LaunchSettings.SCHEMA_VERSION)
             }
 
-            settings.schemaVersion = AOH3LaunchSettings.SCHEMA_VERSION
-            saveLaunchSettings(settings, saveFile)
-            return settings
+            val gameJarPath = json.get("jar_path")?.asString ?: return false
+            if (schemaVersion < 1 && gameJarPath == "aoh3.exe") {
+                onModify()
+                json.addProperty("jar_path", "game.jar")
+            }
+
+            if (schemaVersion < 2 && gameJarPath == "aoh3.jar") {
+                onModify()
+                json.addProperty("jar_path", "game.jar")
+            }
+
+            val gameEntrypoint = json.get("game_entrypoint")?.asString ?: return wasModified
+            if (schemaVersion < 2 && gameEntrypoint == "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher") {
+                onModify()
+                json.addProperty("game_entrypoint", "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher")
+            }
+
+            return wasModified
         }
 
-        private fun saveLaunchSettings(settings: AOH3LaunchSettings, file: File) {
+        private fun saveLaunchSettings(settingsJson: JsonElement, file: File) {
             file.createNewFile()
             file.writeText(
-                gson.toJson(settings)
+                gson.toJson(settingsJson)
             )
         }
 

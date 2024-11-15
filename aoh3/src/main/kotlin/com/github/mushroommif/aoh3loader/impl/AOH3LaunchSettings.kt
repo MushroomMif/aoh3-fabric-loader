@@ -10,14 +10,13 @@ import java.lang.reflect.Type
 import java.nio.file.Paths
 
 data class AOH3LaunchSettings(
-    var schemaVersion: Int = SCHEMA_VERSION,
     var jarPath: String = if (isOnMac()) locateMacGameJar() else "game.jar",
     var gameValuesPath: String = "game/gameValues/GameValues_Text.json",
     var gameEntrypoint: String = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher",
     var versionOverride: String = ""
 ) {
     companion object Serializer: JsonSerializer<AOH3LaunchSettings>, JsonDeserializer<AOH3LaunchSettings> {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
 
         private fun isOnMac(): Boolean {
             return System.getProperty("os.name").lowercase().startsWith("mac")
@@ -40,7 +39,6 @@ data class AOH3LaunchSettings(
             context: JsonSerializationContext
         ): JsonElement {
             val json = JsonObject()
-            json.addProperty("__schema_version", src.schemaVersion)
             json.addProperty("jar_path", src.jarPath)
             json.addProperty("game_values_path", src.gameValuesPath)
             json.addProperty("game_entrypoint", src.gameEntrypoint)
@@ -55,7 +53,6 @@ data class AOH3LaunchSettings(
         ): AOH3LaunchSettings {
             require(json is JsonObject)
             return AOH3LaunchSettings(
-                json.get("__schema_version")?.asInt ?: 0,
                 json.get("jar_path").asString,
                 json.get("game_values_path").asString,
                 json.get("game_entrypoint").asString,
