@@ -9,16 +9,8 @@ it is still in beta so expect some bugs and flaws while using it.
 
 # How to use it:
 > [!WARNING]
-> The game developer is doing some really weird stuff with the game right now.
-> Almost every day he changes name of the game jar file on Windows for some reason
-> and he also changed namespaces of all game classes.
-> Because of it, all mods and the loader are broken right now.
-> But, he also created "lwjgl - LWJGL3 - Version of the game with latest LWJGL, 8th November 2024"
-> beta version of the game that you can select in Steam.
-> *At least at the moment*, the loader works just fine with it, so we suggest you to use it.
->
-> It makes no sense to adapt the loader to the new game files that will change tomorrow again,
-> so we will wait some time and update the loader and mods after stabilization of game files
+> Fabric loader does not work with beta version of the game,
+> it works only with the stable version
 1. Go to "Actions" page of this repository, open a last action and
 download its artifacts
 2. Unzip downloaded archive into the game directory
