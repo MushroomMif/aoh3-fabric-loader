@@ -13,15 +13,15 @@ import java.util.function.Consumer
 import java.util.function.Function
 
 object BrandingPatch: GamePatch() {
-    private const val GV_INJECTED_CLASS = "aoc.kingdoms.lukasz.jakowski.GameValues"
+    private const val GV_INJECTED_CLASS = "aoh.kingdoms.history.mainGame.GameValues"
     private const val GV_INJECTED_METHOD = "init"
     private const val GV_INJECT_AFTER_SET = "text"
 
-    private const val MM_INJECTED_CLASS = "aoc.kingdoms.lukasz.menus.MainMenu"
+    private const val MM_INJECTED_CLASS = "aoh.kingdoms.history.menus.MainMenu"
     private const val MM_INJECTED_METHOD = "<init>"
     private const val MM_INJECT_AT_FIELD_GET = "BUTTON_HEIGHT3"
 
-    private const val LM_INJECTED_CLASS = "aoc.kingdoms.lukasz.menusInGame.InGame_LegaciesEmpty"
+    private const val LM_INJECTED_CLASS = "aoh.kingdoms.history.menusInGame.InGame_LegaciesEmpty"
     private const val LM_INJECTED_METHOD = MM_INJECTED_METHOD
     private const val LM_INJECT_AT_FIELD_GET = MM_INJECT_AT_FIELD_GET
 
@@ -82,7 +82,7 @@ object BrandingPatch: GamePatch() {
             val currentVersion = versionField.get(gameText) as String
             versionField.set(gameText, "$currentVersion Fabric")
 
-            val cfgClass = FabricLauncherBase.getClass("aoc.kingdoms.lukasz.jakowski.CFG")
+            val cfgClass = FabricLauncherBase.getClass("aoh.kingdoms.history.mainGame.CFG")
             val buttonHeight3Field = cfgClass.getField("BUTTON_HEIGHT3")
             val buttonHeight3 = buttonHeight3Field.get(null) as Int
             VERSION_TEXT_POS_X = (buttonHeight3 * 2.3).toInt()

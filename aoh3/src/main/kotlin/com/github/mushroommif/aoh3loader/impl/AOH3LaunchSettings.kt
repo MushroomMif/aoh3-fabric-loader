@@ -11,9 +11,9 @@ import java.nio.file.Paths
 
 data class AOH3LaunchSettings(
     var schemaVersion: Int = SCHEMA_VERSION,
-    var jarPath: String = if (isOnMac()) locateMacGameJar() else "aoh3.jar",
+    var jarPath: String = if (isOnMac()) locateMacGameJar() else "game.jar",
     var gameValuesPath: String = "game/gameValues/GameValues_Text.json",
-    var gameEntrypoint: String = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher",
+    var gameEntrypoint: String = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher",
     var versionOverride: String = ""
 ) {
     companion object Serializer: JsonSerializer<AOH3LaunchSettings>, JsonDeserializer<AOH3LaunchSettings> {

@@ -141,8 +141,8 @@ class AOH3GameProvider: GameProvider {
                 return settings
             }
 
-            if (version < 1 && settings.jarPath == "aoh3.exe") {
-                settings.jarPath = "aoh3.jar"
+            if (version < 1 && settings.jarPath == "game.exe") {
+                settings.jarPath = "game.jar"
             }
 
             settings.schemaVersion = AOH3LaunchSettings.SCHEMA_VERSION
