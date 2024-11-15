@@ -118,7 +118,9 @@ class AOH3GameProvider: GameProvider {
             val launchSettingsFile = launchSettingsPath.toFile()
             if (!launchSettingsFile.exists()) {
                 return AOH3LaunchSettings().also {
-                    saveLaunchSettings(gson.toJsonTree(it), launchSettingsFile)
+                    val json = gson.toJsonTree(it).asJsonObject
+                    json.addProperty("__schema_version", AOH3LaunchSettings.SCHEMA_VERSION)
+                    saveLaunchSettings(json, launchSettingsFile)
                 }
             }
 
