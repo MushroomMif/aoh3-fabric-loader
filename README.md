@@ -11,13 +11,12 @@ it is still in beta so expect some bugs and flaws while using it.
 > [!WARNING]
 > Fabric loader does not work with beta version of the game,
 > it works only with the stable version
-1. Go to "Actions" page of this repository, open a last action and
-download its artifacts
-2. Unzip downloaded archive into the game directory
-3. Download
+1. Download loader's jar file from its [latest release](https://github.com/MushroomMif/aoh3-fabric-loader/releases/latest)
+and move it to the game directory
+2. Download
 [an archive with required libraries](https://disk.yandex.ru/d/lNFkjFRI_5MzUQ)
-and also unzip it to the game directory
-4. If you are using Windows:<br/>
+and unzip it also to the game directory
+3. If you are using Windows:<br/>
 Create a `start.bat` file in the game directory and write
 `"jre/bin/java.exe" -cp "./*" net.fabricmc.loader.impl.launch.knot.KnotClient` there
 <br/><br/>
@@ -28,8 +27,8 @@ If you are using Mac:<br/>
    #!/bin/sh
    java -cp "./*" net.fabricmc.loader.impl.launch.knot.KnotClient
    ```
-5. Open the created file, it will launch the game with the loader
-6. Now you can put mods into `mods` directory (we recommend you to install
+4. Open the created file, it will launch the game with the loader
+5. Now you can put mods into `mods` directory (we recommend you to install
    [AOH3 Fabric Api](https://github.com/MushroomMif/aoh3-fabric-api) right away 
    as almost all mods need this for working properly) and configure
    `fabric_launch_settings.json` if needed. Enjoy!

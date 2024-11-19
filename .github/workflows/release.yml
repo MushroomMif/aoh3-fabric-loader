@@ -1,0 +1,27 @@
+name: Release
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+      - name: Build with Gradle
+        run: gradle build
+      - name: Upload GitHub release
+        uses: AButler/upload-release-assets@v3.0
+        with:
+          files: "build/libs/fabric-loader-0.16.8-fat.jar"
+          repo-token: ${{ secrets.ARTIFACTS_TOKEN }}
