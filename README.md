@@ -1,4 +1,10 @@
 [🇷🇺 Русский](https://github.com/MushroomMif/aoh3-fabric-loader/blob/master/README_RU.md)
+
+> [!CAUTION]
+> This project is dead. I am not interested in this project or in the AOH3 game anymore.
+> Most likely this project will break with new AOH3 updates, if it is not already broken.
+> If you want, you can fork it and update by yourself.
+> Perhaps after some time I will be interested in this project again, but I don't think it will happen soon.
 -----
 AOH3 Fabric Loader
 ===========
