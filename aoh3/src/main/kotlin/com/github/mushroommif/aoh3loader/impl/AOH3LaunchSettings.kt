@@ -16,7 +16,7 @@ data class AOH3LaunchSettings(
     var versionOverride: String = ""
 ) {
     companion object Serializer: JsonSerializer<AOH3LaunchSettings>, JsonDeserializer<AOH3LaunchSettings> {
-        const val SCHEMA_VERSION = 2
+        const val SCHEMA_VERSION = 3
 
         private fun isOnMac(): Boolean {
             return System.getProperty("os.name").lowercase().startsWith("mac")

@@ -149,30 +149,23 @@ class AOH3GameProvider: GameProvider {
                 return false
             }
 
-            var wasModified = false
-            fun onModify() {
-                wasModified = true
-                json.addProperty("__schema_version", AOH3LaunchSettings.SCHEMA_VERSION)
-            }
+            json.addProperty("__schema_version", AOH3LaunchSettings.SCHEMA_VERSION)
 
-            val gameJarPath = json.get("jar_path")?.asString ?: return false
+            val gameJarPath = json.get("jar_path")?.asString ?: return true
             if (schemaVersion < 1 && gameJarPath == "aoh3.exe") {
-                onModify()
                 json.addProperty("jar_path", "game.jar")
             }
 
             if (schemaVersion < 2 && gameJarPath == "aoh3.jar") {
-                onModify()
                 json.addProperty("jar_path", "game.jar")
             }
 
-            val gameEntrypoint = json.get("game_entrypoint")?.asString ?: return wasModified
-            if (schemaVersion < 2 && gameEntrypoint == "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher") {
-                onModify()
-                json.addProperty("game_entrypoint", "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher")
+            val gameEntrypoint = json.get("game_entrypoint")?.asString ?: return true
+            if (schemaVersion == 2 && gameEntrypoint == "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher") {
+                json.addProperty("game_entrypoint", "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher")
             }
 
-            return wasModified
+            return true
         }
 
         private fun saveLaunchSettings(settingsJson: JsonElement, file: File) {

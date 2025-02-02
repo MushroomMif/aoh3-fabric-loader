@@ -11,7 +11,7 @@ import java.util.function.Consumer
 import java.util.function.Function
 
 object EntrypointPatch: GamePatch() {
-    private const val INJECTED_CLASS = "aoh.kingdoms.history.mainGame.AA_Game"
+    private const val INJECTED_CLASS = "aoc.kingdoms.lukasz.jakowski.AA_Game"
     private const val INJECTED_METHOD = "create"
     private const val INJECT_AFTER_CALL = "initLoadInterface"
     private val internalName = this::class.java.name.replace(".", "/")

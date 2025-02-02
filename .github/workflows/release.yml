@@ -23,5 +23,5 @@ jobs:
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: "build/libs/fabric-loader-0.16.8-fat.jar"
+          files: "build/libs/fabric-loader-0.16.9-fat.jar"
           repo-token: ${{ secrets.ARTIFACTS_TOKEN }}
