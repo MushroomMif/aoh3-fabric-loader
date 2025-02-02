@@ -25,6 +25,8 @@ object BrandingPatch: GamePatch() {
     private const val LM_INJECTED_METHOD = MM_INJECTED_METHOD
     private const val LM_INJECT_AT_FIELD_GET = MM_INJECT_AT_FIELD_GET
 
+    private const val CFG_CLASS = "aoc.kingdoms.lukasz.jakowski.CFG"
+
     private val internalName = this::class.java.name.replace(".", "/")
 
     override fun process(
@@ -82,7 +84,7 @@ object BrandingPatch: GamePatch() {
             val currentVersion = versionField.get(gameText) as String
             versionField.set(gameText, "$currentVersion Fabric")
 
-            val cfgClass = FabricLauncherBase.getClass("aoh.kingdoms.history.mainGame.CFG")
+            val cfgClass = FabricLauncherBase.getClass(CFG_CLASS)
             val buttonHeight3Field = cfgClass.getField("BUTTON_HEIGHT3")
             val buttonHeight3 = buttonHeight3Field.get(null) as Int
             VERSION_TEXT_POS_X = (buttonHeight3 * 2.3).toInt()
